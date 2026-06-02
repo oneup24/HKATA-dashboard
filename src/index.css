@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Print report: hidden on screen, full-page when printing */
+#print-report {
+  position: absolute;
+  left: -9999px;
+  visibility: hidden;
+}
+
+@media print {
+  body { visibility: hidden; }
+  #print-report, #print-report * { visibility: visible; }
+  #print-report { position: fixed; top: 0; left: 0; width: 100%; }
+}
