@@ -11,10 +11,19 @@ const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__f
     // Mock config for syntax fallback, actual environment provides real config
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Initialize Firebase safely — no-op if config is missing (e.g. local dev without env vars)
+let app = null;
+let auth = null;
+let db = null;
+try {
+  if (firebaseConfig.apiKey) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+  }
+} catch (e) {
+  console.error("Firebase init failed:", e);
+}
 
 // Simple Inline SVGs to avoid dependency issues while maintaining a premium look
 const Icons = {
@@ -30,6 +39,20 @@ const Icons = {
 };
 
 export default function HKATADashboard() {
+  if (!db) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100 max-w-md">
+          <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl font-black text-indigo-600">H</span>
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Firebase Not Configured</h2>
+          <p className="text-gray-500 text-sm">Add your Firebase config via environment variables to activate the HKATA CRM hub.</p>
+        </div>
+      </div>
+    );
+  }
+
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(true);
