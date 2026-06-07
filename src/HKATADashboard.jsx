@@ -5,10 +5,15 @@ import {
   getFirestore, collection, doc, onSnapshot, updateDoc, addDoc, deleteDoc
 } from 'firebase/firestore';
 
-// Environment Variables Configuration
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'hkata-dashboard-app';
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-    // Mock config for syntax fallback, actual environment provides real config
+// Environment Variables Configuration (Vite uses import.meta.env with VITE_ prefix)
+const appId = import.meta.env.VITE_APP_ID || 'hkata-dashboard-app';
+const firebaseConfig = {
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase safely — no-op if config is missing (e.g. local dev without env vars)
@@ -68,11 +73,7 @@ export default function HKATADashboard() {
   useEffect(() => {
     const authenticate = async () => {
       try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
+        await signInAnonymously(auth);
       } catch (error) {
         console.error("Auth Error:", error);
       }
