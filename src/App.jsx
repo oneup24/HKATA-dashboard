@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import HKATADashboard from './HKATADashboard.jsx';
 import {
   ChevronLeft, ChevronRight, ChevronDown, X, Users, CalendarDays,
   ClipboardList, AlertCircle, Filter, Upload, DollarSign,
@@ -1012,7 +1013,7 @@ function RevenueTab({ events, typeMeta }) {
 
 const _today = new Date();
 
-export default function EventDashboard() {
+function EventDashboard() {
   const [year,           setYear]           = useState(_today.getFullYear());
   const [month,          setMonth]          = useState(_today.getMonth());
   const [filterSet,      setFilterSet]      = useState(new Set());
@@ -1464,6 +1465,42 @@ export default function EventDashboard() {
           onClose={() => setShowPdfModal(false)}
         />
       )}
+    </div>
+  );
+}
+
+// ── App Shell (top-level switcher) ─────────────────────────────────────────────
+
+export default function App() {
+  const [activeApp, setActiveApp] = useState('events');
+
+  return (
+    <div className="relative">
+      {/* App switcher pill — floats over both dashboards */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] flex gap-1 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-1.5 border border-slate-200">
+        <button
+          onClick={() => setActiveApp('events')}
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
+            activeApp === 'events'
+              ? 'bg-slate-800 text-white shadow-sm'
+              : 'text-slate-500 hover:bg-slate-100'
+          }`}
+        >
+          Event Dashboard
+        </button>
+        <button
+          onClick={() => setActiveApp('hkata')}
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
+            activeApp === 'hkata'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-500 hover:bg-slate-100'
+          }`}
+        >
+          HKATA Hub
+        </button>
+      </div>
+
+      {activeApp === 'events' ? <EventDashboard /> : <HKATADashboard />}
     </div>
   );
 }
